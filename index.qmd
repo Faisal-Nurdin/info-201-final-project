@@ -1,0 +1,267 @@
+---
+title: "ThirdDeliverableQuartoReport"
+author: "Faisal Nurdin, Armaan Bhansali"
+format: 
+  dashboard:
+    nav-buttons: [github]
+    github:
+    theme: cyborg
+    fontcolor: black
+    embed-resources: true
+editor: visual
+---
+
+# Introduction & Data Context
+
+## Topic Overview
+
+Many countries' eating habits, like that of Britain, can be explained by the cuisines and preferences of the people living there. And, although their identities, culture, and selection of choice for taste vs convenience play a large part in constituting their people's eating habits, these habits are still largely affected by the economy of the countries they are in. We focus on the UK, which although it is a first world country, it still has its own challenges and complexities.
+
+We chose the UK particularly because it is a large first-world country that has multiple different cuisines but also has a lot of economic factors playing into it as well. Because of these economic factors, food prices can sway up and down. Additionally, things like extrnal economic factors or other economic crisises can play into those prices as well (like federal aid) as mentioned by the UK from review on the crisis of 2007-8 https://www.gov.uk/research-for-development-outputs/foreign-assistance-and-the-food-crisis-of-2007-08?utm_source=chatgpt.com
+
+Lastly, the other important thing about this data is that, in first-world countries like the UK, things like trends or preference can play a lot into prices too. We want to investigate how some of these particular things go down and how these complexities affect people, because food is a core human need and right, and any changes to it are extremely important and can affect the livelihood of millions of people.
+
+## Data Context
+
+First dataset is from: https://www.gov.uk/government/statistical-data-sets/family-food-datasets
+
+Source: The family food datasets are published by the UK department for enviorement, food and rural affairs as part of the annual Family Food statistical publication. It is realiable as it is an official UK goverment statistic release, updates with each new family food publication and based on real household purchase records.
+
+Meaning: This dataset represents UK household food and drink expenditure based on recorded household purchases. It is relevant to our porject because it provides the main outcome we want to study and which we can then use to compare against economic indicators from our second dataset.
+
+Data Observations: The spending spreadsheet is structured as a table where the food/ drink categories appear as descriptive fields, and the years appear as columns containing the spending values for each year. In the file that we are using we reshaped the data into a long format so that each row corresponds to a category in a specific year with the spending amount attached if that makes sense.
+
+Source: The second dataset comes form the World Bank Groups World Developent Indicators. It is complied and published by the World Bank from officially recognized international sources. Due to this the source is quite reliable I think.
+
+Meaning: The WDI dataset represents country level development and economic indicators by year (for example: GDP, inflation, unemployment). This is revelevant to the Family Food spending dataset because it provides the economic context that may relate to changed in UK household food spending over time.
+
+Data Observations: This is similarly formatted to the last dataset by year, although it shows different economic statistics by year.
+
+# Loading Data
+
+```{r}
+#| warning: false
+#| echo: true
+
+# Loading Data 
+# This is a library I found that helped me read an ODS file to a dataframe
+# with the read_ods() function.
+library("readODS")
+
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+
+ods_sheets("UKExp_6Nov25.ods")
+
+food <- read_ods("UKExp_6Nov25.ods",
+                 sheet = "expenditure",
+                 skip = 4)
+
+food_long <- food |>
+  pivot_longer(
+    cols = matches("^[0-9]"),
+    names_to = "year_raw",
+    values_to = "food_spend"
+  )
+
+food_long <- food_long |>
+  mutate(year =
+    case_when(
+      ## I searched up how to use str_detect and str_replace when trying to figure how to 
+      ## fix the annoying formatting issues with the original ods document. I did this a few more times 
+      ## as well with tools such as values_transform since I didn't know if
+      ## there was a way to fix this using the class methods only, not sure
+      ## if this counts as using string manipulation for the visualisations but I think this works.
+      str_detect(year_raw, "^[0-9]{4}$") ~ as.numeric(year_raw),           # 1998
+      str_detect(year_raw, "^[0-9]{4}-[0-9]") ~ as.numeric(substr(year_raw,1,4)),  # 2002-3
+      str_detect(year_raw, "^[0-9]{6}$") ~ as.numeric(substr(year_raw,1,4)),        # 201516
+      TRUE ~ NA_real_
+    )
+  )
+
+food_yearly <- food_long |>
+  filter(!is.na(year)) |>
+  group_by(year) |>
+  summarise(food_spend = sum(as.numeric(food_spend), na.rm = TRUE))
+
+
+economy <- read.csv("e64078a6-0ab1-4e0e-ac55-89fd259a88f5_Data.csv", check.names = FALSE)
+
+## Used slice to get rid of the last few lines, searched up ways to do that and this was one that came up, i use this agian later in one of my data visualizations to get rid of an extra value too
+economy <- economy |> 
+  slice(1:(n() - 5))
+
+
+names(economy) <- names(economy) |>
+  str_replace("([0-9]{4}) \\[YR[0-9]{4}\\]", "\\1")
+
+economy_long <- economy |>
+  pivot_longer(
+    cols = matches("^[0-9]{4}$"),
+    names_to = "year",
+    values_to = "value",
+    values_transform = list(value = as.character)
+  ) |>
+  mutate(
+    year = as.integer(year),
+    value = as.numeric(value)
+  )
+
+economy_by_year <- economy_long |>
+  select(`Series Name`, year, value) |>
+  pivot_wider(
+    names_from = `Series Name`,
+    values_from = value
+  )
+
+food_economy <- food_long |>
+  inner_join(economy_by_year, join_by(year))
+```
+
+# Data Presenting 1
+
+## Question 1: How has spending on yogurt changed over time in the UK
+
+1.  How has spending on yogurt changed over time in the UK?
+
+-   We chose yogurt as an example because to show how a single product can be affected by different factors. In this case , yogurt prices have been steadily rising over the years in the UK with different key points like hitting market saturation (1990s), the popularization of yogurt cups and greek yogurt (2000s). I chose yogurt randomly, and yet it was affected by both economic (2008 crisis), market (market saturation), and preferential (yogurt cups & greek yogurt becoming popular) elements.
+
+## Visualization for the yogurt spendings over time in the UK
+
+```{r}
+#| echo: true
+# creating a new one for yogurt based on year only, but theres a duplicate
+# of 2015 so i delete it using slice after grouping so each year has only one entry
+# which fixes that issue thankfully
+food_economy_yoghurt <- food_economy |>
+  filter(`Minor Food Code` == "Yoghurt") |>
+  group_by(year) |>
+  slice(1) |>
+  ungroup()
+
+yoghurt_yearly <- food_economy_yoghurt |>
+  group_by(year) |>
+  summarise(yoghurt_spend = sum(as.numeric(food_spend), na.rm = TRUE))
+
+yogurt_plot <- ggplot(yoghurt_yearly) +
+  geom_line(mapping = aes(
+    x = year, 
+    y = yoghurt_spend
+  )) +
+  labs(
+    title = "Weekly Yogurt spendings (per avg person in pence) over the years in the UK",
+    x = "Year",
+    y = "Avg UK Person's Yogurt Spendings"
+  )
+
+```
+
+## Graph
+
+```{r}
+ggplotly(yogurt_plot)
+```
+
+# Data Presenting 2
+
+## Data Row 1
+
+What patterns of meat consumption changed in 2008 during the economic crisis in the UK? With this question, we wanted to see if economic crisises could cause changes in choices of food. We can see that this is true, with a considerable decrease in peoples spending on lamb and goat, which are often more expensive than other meats, which could be attributed to the 2008 economic crisis affecting prices & people's incomes in the UK.
+
+## Row 2
+
+### 2008 meat consumption {height="70%"}
+
+```{r}
+# 2008 one
+food_economy_meats_2008 <-
+  food_economy |>
+  filter(
+    `Food Group` == "Beef and veal" & `year` == 2008 |
+    `Food Group` == "Mutton and lamb" & `year` == 2008  | 
+    `Food Group` == "Pork" & `year` == 2008 | 
+    `Food Group` == "Bacon and ham" & `year` == 2008 | 
+    `Food Group` == "Cooked poultry not purchased in cans" & `year` == 2008) |>
+  group_by(`Food Group`) |>
+  summarise(
+    spendings = sum(food_spend, na.rm = TRUE) # na.rm for missing values
+  )
+
+meats_graph_2008 <- ggplot(food_economy_meats_2008) +
+  geom_col(mapping = aes(
+    x = `Food Group`,
+    y = spendings,
+  )) + labs (
+    title = "Major Meat Group Consumption in 2008 Crisis",
+    x = "Type of Meat",
+    y = "Weekly Avg Spendings (in Pence)"
+  )
+ggplotly(meats_graph_2008)
+```
+
+### General meat consumption {height="70%"}
+
+```{r}
+# General one
+food_economy_meats <-
+  food_economy |>
+  filter(
+    `Food Group` == "Beef and veal" |
+    `Food Group` == "Mutton and lamb" | 
+    `Food Group` == "Pork" | 
+    `Food Group` == "Bacon and ham" | 
+    `Food Group` == "Cooked poultry not purchased in cans" ) |>
+  group_by(`Food Group`) |>
+  summarise(
+    spendings = sum(food_spend, na.rm = TRUE) # na.rm for missing values
+  )
+
+meats_graph <- ggplot(food_economy_meats) +
+  geom_col(mapping = aes(
+    x = `Food Group`,
+    y = spendings
+  )) + labs (
+    title = "Major Meat Group Consumption (In general since the 1970s)",
+    x = "Type of Meat",
+    y = "Weekly Avg Spendings (in Pence)"
+  )
+ggplotly(meats_graph)
+```
+
+# Data Presenting 3
+
+## 
+
+3.  How does the GDP affect eating out in the UK? 
+We can see that during and after 2020, there is a huge drop in the amount of eating out that is happening in the UK due to the pandemic and covid. This illustrates that, beyond just economic factors like the recession in 2008, other factors can affect eating habits too. \## Note: This excludes before 2000 since this data wasn't tracked then.
+
+```{r}
+eating_out_yearly <- food_economy |>
+  filter(
+    `Food Category` == "Food and drink purchases for consumption outside the home"
+  ) |>
+  group_by(year) |>
+  summarise(
+    eating_out_spend = mean(as.numeric(food_spend), na.rm = TRUE)
+  ) |>
+  mutate(section = ifelse(year < 2020, "Before 2020", "2020 and after"))
+
+ggplot(eating_out_yearly) +
+  geom_point(mapping = aes(
+    x = year,
+    y = eating_out_spend,
+    color = section
+  ))
+```
+
+# Conclusion
+
+## 
+Summary Takeaways
+
+From this data we can see that our initial hypothesis, that there are a variety of factors that affect the eating habits in the UK is true. Not only do specific economic crisises affect it by causing them to switch foods (like reducing in using expensive meats like lamb and goat), but also other factors like popular trends (such as yogurt cups and greek yogurt becoming popular) also affect it.
+
+In addition, their methods of consumption are also being affected by these crisises. We can see that it is is evident that during the covid pandemic, the spending on eating out vastly decreased. All in all, we can see that there ends up being a need for more in depth analysis on this data, because beyond just the huge impacts there are also a multitude of small thigns that are also probably effecting this data.
