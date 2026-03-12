@@ -1,0 +1,229 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JupyterHub</title>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+      <link rel="stylesheet"
+            href="/2026-winter-info-201-b/hub/static/css/style.min.css?v=1169d53348a10b2020fa67f02516a65c955f1483603703fdb5d65653c099dc66f2a52246ae0856c6f1ebcc5e1c5f527a3fa9210d12e6d8ec77e0e095d9b2c734"
+            type="text/css" />
+    
+    
+      <link rel="icon" href="/2026-winter-info-201-b/hub/static/favicon.ico?v=fde5757cd3892b979919d3b1faa88a410f28829feb5ba22b6cf069f2c6c98675fceef90f932e49b510e74d65c681d5846b943e7f7cc1b41867422f0481085c1f" type="image/x-icon">
+    
+    
+      <script src="/2026-winter-info-201-b/hub/static/components/bootstrap/dist/js/bootstrap.bundle.min.js?v=1ef3a326b7703690db9062481b664da83955a8ca3beea6ece0c7b871a8741e80eb7e1adb03ef12065667d4aaef010c3b7082cb3c526f770220a61cd098c9be3f"
+              type="text/javascript"
+              charset="utf-8"></script>
+      <script src="/2026-winter-info-201-b/hub/static/components/requirejs/require.js?v=1ff44af658602d913b22fca97c78f98945f47e76dacf9800f32f35350f05e9acda6dc710b8501579076f3980de02f02c97f5994ce1a9864c21865a42262d79ec"
+              type="text/javascript"
+              charset="utf-8"></script>
+      <script src="/2026-winter-info-201-b/hub/static/components/jquery/dist/jquery.min.js?v=bf6089ed4698cb8270a8b0c8ad9508ff886a7a842278e98064d5c1790ca3a36d5d69d9f047ef196882554fc104da2c88eb5395f1ee8cf0f3f6ff8869408350fe"
+              type="text/javascript"
+              charset="utf-8"></script>
+      <script src="/2026-winter-info-201-b/hub/static/js/darkmode.js?v=2fd9a7d11ad78df9351fed40ab35eab52e1e6a3d516f188b652120e6faf57b8e387a30aae8f52a6fb51563d06d04545c7005da0b77a98c21b0bd28f6d1cdfa11"
+              type="text/javascript"
+              charset="utf-8"></script>
+    
+    
+    
+    <script type="text/javascript">
+      require.config({
+        
+        urlArgs: "v=20260306122046",
+        
+        baseUrl: '/2026-winter-info-201-b/hub/static/js',
+        paths: {
+          components: '../components',
+          jquery: '../components/jquery/dist/jquery.min',
+          moment: "../components/moment/moment",
+        },
+      });
+
+      window.jhdata = {
+        base_url: "/2026-winter-info-201-b/hub/",
+        prefix: "/2026-winter-info-201-b/",
+        
+        user: "fmnurdin",
+        
+        
+        admin_access: false,
+        
+        
+        options_form: false,
+        
+        xsrf_token: "MnwxOjB8MTA6MTc3MzI2OTc5OHw1Ol94c3JmfDg4Ok5USTFNMk5qT1dJd09HVmtOREF3WkRneU56VTFOMlpqWmpZMk1qQXdZelk2T0RSbU1tWXlOVEkwTmpsa05EaGtORGczWmpVek1qbGxPREkwWTJJMk1tTT18MWM1ZGZkNDE3YmY1YzBiNzViOWEyYjAxNTFmYWE2YjU5MmJiY2QyZjQxZDAzYzYyNjE3NGJjZWRkOGI1MzZiOQ",
+      };
+
+</script>
+    
+    
+      <meta name="description" content="JupyterHub">
+      <meta name="keywords" content="Jupyter, JupyterHub">
+    
+  </head>
+  <body>
+    <noscript>
+      <div id='noscript'>
+        JupyterHub requires JavaScript.
+        <br>
+        Please enable it to proceed.
+      </div>
+    </noscript>
+    
+      <nav class="navbar navbar-expand-sm bg-body-tertiary mb-4">
+        <div class="container-fluid">
+          
+            <span id="jupyterhub-logo" class="navbar-brand">
+              <a href="/2026-winter-info-201-b/hub/">
+                <img src='/2026-winter-info-201-b/hub/logo'
+                     alt='JupyterHub logo'
+                     class='jpy-logo'
+                     title='Home' />
+              </a>
+            </span>
+          
+          
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#thenavbar"
+                    aria-controls="thenavbar"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+          <div class="collapse navbar-collapse" id="thenavbar">
+            <ul class="navbar-nav me-auto mb-0">
+              
+                
+                  <li class="nav-item">
+                    <a class="nav-link" href="/2026-winter-info-201-b/hub/home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/2026-winter-info-201-b/hub/token">Token</a>
+                  </li>
+                  
+                  
+                
+              
+            </ul>
+            <ul class="nav navbar-nav me-2">
+              
+                <li class="nav-item">
+                  
+                    <button class="btn btn-sm"
+                            id="dark-theme-toggle"
+                            aria-label="Toggle dark mode"
+                            title="Toggle dark mode">
+                      <i aria-hidden="true" class="fa fa-circle-half-stroke"></i>
+                    </button>
+                  
+                </li>
+                <li class="nav-item">
+                  
+                    <span id="login_widget">
+                      
+                        <span class="me-1">fmnurdin</span>
+                        <a id="logout"
+                           role="button"
+                           class="btn btn-sm btn-outline-contrast"
+                           href="/2026-winter-info-201-b/hub/logout"> <i aria-hidden="true" class="fa fa-sign-out"></i>Logout</a>
+                      
+                    </span>
+                  
+                </li>
+              
+            </ul>
+          </div>
+          
+          
+        </div>
+      </nav>
+    
+    
+      
+    
+    
+  <div class="container">
+    <div class="row">
+      <div class="text-center">
+        
+          <h1>
+            
+              Server not running
+            
+          </h1>
+        
+        
+          <p>
+            
+              Your server  is not running.
+              
+                Would you like to start it?
+              
+            
+          </p>
+        
+        
+          <a id="start"
+             role="button"
+             class="btn btn-lg btn-primary"
+             href="/2026-winter-info-201-b/hub/spawn/fmnurdin?next=%2F2026-winter-info-201-b%2Fhub%2Fuser%2Ffmnurdin%2Ffiles%2FShared%2FBB6%2Fe64078a6-0ab1-4e0e-ac55-89fd259a88f5_Data.csv%3F_xsrf%3DMnwxOjB8MTA6MTc3MzI2OTgxOXw1Ol94c3JmfDEzMjpOVEkxTTJOak9XSXdPR1ZrTkRBd1pEZ3lOelUxTjJaalpqWTJNakF3WXpZNlpqWmtOamd6TlRkaE56Rm1NV0ptTkRZeE1XSmxPVEprWkdVMlptVXdObUk0WVdSa05EaGtNVEJtTmpWalkySmxNell5WW1WbE5qYzRNVE5pTkdSak9RPT18ZGNmMmM1OTU1YmRkZjI4ZmYxNDUwMTNkOThmYTUyNjU5MzRkNzFhMGVlOWUyZjY5NmI4OTQ5N2Y5ZjE3M2Q3Zg">
+            
+              Launch
+            
+            Server 
+          </a>
+        
+      </div>
+    </div>
+  </div>
+
+    
+    
+    
+  
+  
+  <div class="modal fade"
+       id="error-dialog"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="error-label"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="error-label">Error</h2>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+      <div class="ajax-error alert-danger">The error</div>
+    </div>
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-primary"
+                  data-bs-dismiss="modal"
+                  data-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    
+  
+    
+  
+  <script type="text/javascript">
+    require(["not_running"]);
+  </script>
+
+  </body>
+</html>

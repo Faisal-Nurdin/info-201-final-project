@@ -1,5 +1,5 @@
 ---
-title: "ThirdDeliverableQuartoReport"
+title: "British Eating Habits"
 author: "Faisal Nurdin, Armaan Bhansali"
 format: 
   dashboard:
@@ -37,11 +37,9 @@ Meaning: The WDI dataset represents country level development and economic indic
 
 Data Observations: This is similarly formatted to the last dataset by year, although it shows different economic statistics by year.
 
-# Loading Data
-
 ```{r}
 #| warning: false
-#| echo: true
+#| echo: false
 
 # Loading Data 
 # This is a library I found that helped me read an ODS file to a dataframe
@@ -53,8 +51,6 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(plotly)
-
-ods_sheets("UKExp_6Nov25.ods")
 
 food <- read_ods("UKExp_6Nov25.ods",
                  sheet = "expenditure",
@@ -124,15 +120,14 @@ food_economy <- food_long |>
 # Data Presenting 1
 
 ## Question 1: How has spending on yogurt changed over time in the UK
-
+###
 1.  How has spending on yogurt changed over time in the UK?
 
 -   We chose yogurt as an example because to show how a single product can be affected by different factors. In this case , yogurt prices have been steadily rising over the years in the UK with different key points like hitting market saturation (1990s), the popularization of yogurt cups and greek yogurt (2000s). I chose yogurt randomly, and yet it was affected by both economic (2008 crisis), market (market saturation), and preferential (yogurt cups & greek yogurt becoming popular) elements.
 
-## Visualization for the yogurt spendings over time in the UK
+### Visualization for the yogurt spendings over time in the UK
 
 ```{r}
-#| echo: true
 # creating a new one for yogurt based on year only, but theres a duplicate
 # of 2015 so i delete it using slice after grouping so each year has only one entry
 # which fixes that issue thankfully
@@ -158,9 +153,6 @@ yogurt_plot <- ggplot(yoghurt_yearly) +
   )
 
 ```
-
-## Graph
-
 ```{r}
 ggplotly(yogurt_plot)
 ```
@@ -235,8 +227,7 @@ ggplotly(meats_graph)
 
 ## 
 
-3.  How does the GDP affect eating out in the UK? 
-We can see that during and after 2020, there is a huge drop in the amount of eating out that is happening in the UK due to the pandemic and covid. This illustrates that, beyond just economic factors like the recession in 2008, other factors can affect eating habits too. \## Note: This excludes before 2000 since this data wasn't tracked then.
+3.  How does the GDP affect eating out in the UK? We can see that during and after 2020, there is a huge drop in the amount of eating out that is happening in the UK due to the pandemic and covid. This illustrates that, beyond just economic factors like the recession in 2008, other factors can affect eating habits too. \## Note: This excludes before 2000 since this data wasn't tracked then.
 
 ```{r}
 eating_out_yearly <- food_economy |>
@@ -260,6 +251,7 @@ ggplot(eating_out_yearly) +
 # Conclusion
 
 ## 
+
 Summary Takeaways
 
 From this data we can see that our initial hypothesis, that there are a variety of factors that affect the eating habits in the UK is true. Not only do specific economic crisises affect it by causing them to switch foods (like reducing in using expensive meats like lamb and goat), but also other factors like popular trends (such as yogurt cups and greek yogurt becoming popular) also affect it.
